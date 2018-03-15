@@ -3,7 +3,7 @@
 #include <cmath>
 #include <limits>
 
-// -- Helper functions -- //
+//  --  Helper functions  --  //
 
 bool equal_floats(float lhs, float rhs)
 {
@@ -23,7 +23,13 @@ float degree_to_radian(float deg)
     return (deg / 360) * PI;
 }
 
-// -- Class Vec2 -- //
+
+//  --  Class Vec2  --  //
+
+//       2x1
+//      [ x ]
+//      [ y ]
+//        v
 
 // Constructors
 vec2::vec2(float _x, float _y)
@@ -36,24 +42,28 @@ vec2& vec2::operator  = (const vec2& rhs)
 {
     x = rhs.x;
     y = rhs.y;
+
     return *this;
 }
 vec2& vec2::operator += (const vec2& rhs)
 {
     x += rhs.x;
     y += rhs.y;
+    
     return *this;
 }
 vec2& vec2::operator -= (const vec2& rhs)
 {
     x -= rhs.x;
     y -= rhs.y;
+
     return *this;
 }
 vec2& vec2::operator *= (float rhs)
 {
     x *= rhs;
     y *= rhs;
+
     return *this;
 }
 
@@ -63,7 +73,6 @@ vec2 vec2::operator - (const vec2& rhs)      const { return vec2(*this) -= rhs; 
 vec2 operator * (const vec2& lhs, float rhs)       { return vec2(lhs)   *= rhs; }
 vec2 operator * (float lhs, const vec2& rhs)       { return rhs * lhs; }
 
-
 // Dot product
 float vec2::operator * (const vec2& rhs) const
 {
@@ -71,17 +80,18 @@ float vec2::operator * (const vec2& rhs) const
 }
 
 // Member functions
-void  vec2::normalize()
+vec2& vec2::normalize()
 {
     float l = length();
     x /= l;
     y /= l;
+
+    return *this;
 }
 float vec2::length() const
 {
     return std::sqrt( x*x + y*y );
 }
-
 bool vec2::parallel  (const vec2& rhs) const
 {
     float dot = this->operator*(rhs);
@@ -114,7 +124,124 @@ vec2 vec2::projection(const vec2& rhs) const
     return rhs * ( dot / (rhs * rhs) );
 }
 
-// -- Class mat2x2 -- //
+
+//  --  Class vec3  --  //
+
+//       3x1
+//      [ x ]
+//      [ y ]
+//      [ z ]
+//        v
+
+// Constructors
+vec3::vec3(float _x, float _y, float _z)
+    : x{_x} , y{_y} , z{_z} {}
+vec3::vec3(const vec3& _vec)
+    : x{_vec.x} , y{_vec.y} , z{_vec.z} {}
+
+// Assignment operators
+vec3& vec3::operator  = (const vec3& rhs)
+{
+    x = rhs.x;
+    y = rhs.y;
+    z = rhs.z;
+
+    return *this;
+}
+vec3& vec3::operator += (const vec3& rhs)
+{
+    x += rhs.x;
+    y += rhs.y;
+    z += rhs.z;
+    
+    return *this;
+}
+vec3& vec3::operator -= (const vec3& rhs)
+{
+    x -= rhs.x;
+    y -= rhs.y;
+    z -= rhs.z;
+
+    return *this;
+}
+vec3& vec3::operator *= (float rhs)
+{
+    x *= rhs;
+    y *= rhs;
+    z *= rhs;
+
+    return *this;
+}
+
+// Arithmetic operators
+vec3 vec3::operator + (const vec3& rhs)      const { return vec3(*this) += rhs; }
+vec3 vec3::operator - (const vec3& rhs)      const { return vec3(*this) -= rhs; }
+vec3 operator * (const vec3& lhs, float rhs)       { return vec3(lhs)   *= rhs; }
+vec3 operator * (float lhs, const vec3& rhs)       { return rhs * lhs; }
+
+// Dot product
+float vec3::operator * (const vec3& rhs) const
+{
+    return (x * rhs.x) + (y * rhs.y) + (z * rhs.z);
+}
+vec3& vec3::normalize()
+{
+    float l = length();
+    x /= l;
+    y /= l;
+    z /= l;
+
+    return *this;
+}
+float vec3::length() const
+{
+    return std::sqrt( x*x + y*y + z*z);
+}
+bool vec3::parallel  (const vec3& rhs) const
+{
+    float dot = this->operator*(rhs);
+    float mag = length() * rhs.length();
+
+    if ( equal_floats(dot, mag) )
+        return true;
+
+    return false;
+}
+bool vec3::orthogonal(const vec3& rhs) const
+{
+    float dot = this->operator*(rhs);
+
+    if ( equal_floats(dot, 0.0f) )
+        return true;
+
+    return false;
+}
+float vec3::angle_to (const vec3& rhs) const
+{
+    float dot = this->operator*(rhs);
+    float mag = length() * rhs.length();
+
+    return std::acos(dot / mag);
+}
+vec3 vec3::projection(const vec3& rhs) const
+{
+    float  dot = this->operator*(rhs);
+    return rhs * ( dot / (rhs * rhs) );
+}
+vec3  vec3::cross_product(const vec3& rhs) const
+{
+    return vec3( (y * rhs.z) - (z * rhs.y),
+                 (z * rhs.x) - (x * rhs.z),
+                 (x * rhs.y) - (y * rhs.x) );
+}
+
+
+//  --  Class mat2x2  --  //
+
+//        2x2 
+//      [ a b ] 
+//      [ c d ] 
+//        v u
 
 // Constructors
 mat2x2::mat2x2( float _a, 

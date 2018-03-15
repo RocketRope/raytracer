@@ -39,7 +39,7 @@ class vec2
         float operator * (const vec2& rhs) const;
 
         // Member functions
-        void  normalize ();
+        vec2& normalize ();
         float length    () const;
 
         bool  parallel  (const vec2& rhs) const;
@@ -54,14 +54,60 @@ class vec2
         }
 };
 
+class vec3
+{
+    public:
+                         //  3x1
+        float x = 0.0f;  // [ x ]
+        float y = 0.0f;  // [ y ]
+        float z = 0.0f;  // [ z ]
+                         //   v
+
+        // Constructors
+        vec3(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f);
+        vec3(const vec3& _vec);
+
+        // Assignment operators
+        vec3& operator  = (const vec3& rhs);
+        vec3& operator += (const vec3& rhs);
+        vec3& operator -= (const vec3& rhs);
+        vec3& operator *= (float rhs);
+
+        // Arithmetic operators
+        vec3 operator + (const vec3& rhs) const;
+        vec3 operator - (const vec3& rhs) const;
+
+ friend vec3 operator * (const vec3& lhs, float rhs);
+ friend vec3 operator * (float lhs, const vec3& rhs);
+
+        // Dot product
+        float operator * (const vec3& rhs) const;
+
+        // Member functions
+        vec3& normalize ();
+        float length    () const;
+
+        bool  parallel  (const vec3& rhs) const;
+        bool  orthogonal(const vec3& rhs) const;
+        float angle_to  (const vec3& rhs) const;
+        vec3  projection(const vec3& rhs) const;
+        vec3  cross_product(const vec3& rhs) const;
+
+        // --  Std ostream  --  //
+ friend std::ostream& operator << (std::ostream& os, vec3 rhs) 
+        {
+            return os << "[" << rhs.x << " " << rhs.y << " " << rhs.z << "]";
+        }
+};
+
 class mat2x2
 {
     public:
 
-        float a = 1.0f;  //    2x2 
-        float b = 0.0f;  // [ a  b ] 
-        float c = 0.0f;  // [ c  d ] 
-        float d = 1.0f;  //   v  u
+        float a = 1.0f;  //   2x2 
+        float b = 0.0f;  // [ a b ] 
+        float c = 0.0f;  // [ c d ] 
+        float d = 1.0f;  //   v u
 
         // Constructors
         mat2x2( float _a = 1.0f, 
@@ -102,8 +148,4 @@ class mat2x2
 };
 
 
-
-
-
-
-#endif
+#endif // _VMATH_H_

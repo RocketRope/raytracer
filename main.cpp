@@ -4,20 +4,21 @@
 
 int main()
 {
-    mat2x2 A(1.1f,  2.2f,  3.3f, 4.4f);
-    mat2x2 B = A.transpose();
+    vec3 v( 2.0f, -3.0f, -1.0f);
+    vec3 u( 1.0f,  4.0f, -2.0f);
+    v.normalize();
+    u.normalize();
+    vec3 x = v.cross_product(u);
+   
 
-    vec2 V(1.1f, 2.2f);
-
-  
-
-    std::cout << A   << " |A| = " << A.determinant() << std::endl;
-    std::cout << B   << " |B| = " << B.determinant() << std::endl;
-
-    std::cout << A*B << " "       << B*A             << std::endl;
-
-    std::cout << A*V << std::endl;
-
+    std::cout << v << std::endl;
+    std::cout << u << std::endl;
     
+    std::cout << std::endl;
+
+    std::cout << x << " " << x.length()  << std::endl;
+    std::cout << v << " " <<  v.length() << std::endl;
+    std::cout << u.orthogonal(x) << std::endl;
+
     return 0;
 }
