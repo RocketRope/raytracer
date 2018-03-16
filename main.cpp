@@ -4,21 +4,21 @@
 
 int main()
 {
-    vec3 v( 2.0f, -3.0f, -1.0f);
-    vec3 u( 1.0f,  4.0f, -2.0f);
-    v.normalize();
-    u.normalize();
-    vec3 x = v.cross_product(u);
-   
+ 
+    mat3x3 D(1, 1, 0,
+              2, 1, 0,
+             2, 1,  1 );
 
-    std::cout << v << std::endl;
-    std::cout << u << std::endl;
+    std::cout << D << std::endl;
+
+    mat3x3 A = D.inverse();
+
+    std::cout << A << std::endl;
+    std::cout << A*D << std::endl;
+    std::cout << D*A << std::endl;
+
+    std::cout << D.transpose() << std::endl;
     
-    std::cout << std::endl;
-
-    std::cout << x << " " << x.length()  << std::endl;
-    std::cout << v << " " <<  v.length() << std::endl;
-    std::cout << u.orthogonal(x) << std::endl;
 
     return 0;
-}
+} 

@@ -35,7 +35,9 @@ float degree_to_radian(float deg)
 vec2::vec2(float _x, float _y)
     : x{_x} , y{_y} {}
 vec2::vec2(const vec2& _vec)
-    : x{_vec.x} , y{_vec.y} {}
+{
+    this->operator=(_vec);
+}
 
 // Assignment operators
 vec2& vec2::operator  = (const vec2& rhs)
@@ -137,7 +139,9 @@ vec2 vec2::projection(const vec2& rhs) const
 vec3::vec3(float _x, float _y, float _z)
     : x{_x} , y{_y} , z{_z} {}
 vec3::vec3(const vec3& _vec)
-    : x{_vec.x} , y{_vec.y} , z{_vec.z} {}
+{
+    this->operator=(_vec);
+}
 
 // Assignment operators
 vec3& vec3::operator  = (const vec3& rhs)
@@ -241,18 +245,20 @@ vec3  vec3::cross_product(const vec3& rhs) const
 //        2x2 
 //      [ a b ] 
 //      [ c d ] 
-//        v u
+//        u v
 
 // Constructors
-mat2x2::mat2x2( float _a, 
-                float _b, 
-                float _c, 
-                float _d )
-    : a{_a}, b{_b}, c{_c}, d{_d} {}
-mat2x2::mat2x2(const vec2& v, const vec2& u)
-    : a{v.x}, b{u.x}, c{v.y}, d{u.y} {}
+mat2x2::mat2x2( float _a, float _b, 
+                float _c, float _d )
+    : a{_a} , b{_b}, 
+      c{_c} , d{_d} {}
+mat2x2::mat2x2(const vec2& u, const vec2& v)
+    : a{u.x} , b{v.x}, 
+      c{u.y} , d{v.y} {}
 mat2x2::mat2x2(const mat2x2& _mat)
-    : a{_mat.a}, b{_mat.b}, c{_mat.c}, d{_mat.d} {}
+{
+    this->operator=(_mat);
+}
 
 // Assignment operators
 mat2x2& mat2x2::operator  = (const mat2x2& rhs)
@@ -280,9 +286,9 @@ mat2x2& mat2x2::operator -= (const mat2x2& rhs)
 mat2x2& mat2x2::operator *= (const mat2x2& rhs)
 {
     return *this = mat2x2( (a * rhs.a) + (b * rhs.c),
-                            (a * rhs.b) + (b * rhs.d),
-                            (c * rhs.a) + (d * rhs.c),
-                            (c * rhs.b) + (d * rhs.d) );
+                           (a * rhs.b) + (b * rhs.d),
+                           (c * rhs.a) + (d * rhs.c),
+                           (c * rhs.b) + (d * rhs.d) );
 }
 mat2x2& mat2x2::operator *= (float rhs)
 {
@@ -296,13 +302,15 @@ mat2x2& mat2x2::operator *= (float rhs)
 mat2x2 mat2x2::operator + (const mat2x2& rhs)    const { return mat2x2(*this) += rhs; }
 mat2x2 mat2x2::operator - (const mat2x2& rhs)    const { return mat2x2(*this) -= rhs; }
 mat2x2 mat2x2::operator * (const mat2x2& rhs)    const { return mat2x2(*this) *= rhs; }
-mat2x2 operator * (const mat2x2& lhs, float rhs)       { return mat2x2(lhs)   *= rhs; }
-mat2x2 operator * (float lhs, const mat2x2& rhs)       { return rhs * lhs; }
+
 vec2   mat2x2::operator * (const vec2& rhs) const 
 {
-    return vec2(a * rhs.x + b * rhs.y,
-                c * rhs.x + d * rhs.y );
+    return vec2( a * rhs.x + b * rhs.y,
+                 c * rhs.x + d * rhs.y );
 }
+
+mat2x2 operator * (const mat2x2& lhs, float rhs)       { return mat2x2(lhs)   *= rhs; }
+mat2x2 operator * (float lhs, const mat2x2& rhs)       { return rhs * lhs; }
 
 // Member functions
 float mat2x2::determinant() const
@@ -318,3 +326,119 @@ mat2x2 mat2x2::transpose() const
 {
     return mat2x2(d,b,c,a);
 }
+
+
+//  --  class mat3x3  --  //
+
+//     3x3
+//  [ a b c]
+//  [ d e f]
+//  [ g h i]
+//    u v w
+
+mat3x3::mat3x3( float _a, float _b, float _c, 
+                float _d, float _e, float _f,
+                float _g, float _h, float _i )
+    : a{_a} , b{_b} , c{_c},
+      d{_d} , e{_e} , f{_f},
+      g{_g} , h{_h} , i{_i} {}
+mat3x3::mat3x3(const vec3& u, const vec3& v, const vec3& w)
+    : a{u.x} , b{v.x} , c{w.x},
+      d{u.y} , e{v.y} , f{w.y},
+      g{u.z} , h{v.z} , i{w.z} {}
+mat3x3::mat3x3(const mat3x3& _mat)
+{
+    this->operator=(_mat);
+}
+
+// Assignment operators
+mat3x3& mat3x3::operator  = (const mat3x3& rhs)
+{
+    a = rhs.a; b = rhs.b; c = rhs.c;
+    d = rhs.d; e = rhs.e; f = rhs.f;
+    g = rhs.g; h = rhs.h; i = rhs.i;
+
+    return *this;
+}
+mat3x3& mat3x3::operator += (const mat3x3& rhs)
+{
+    a += rhs.a; b += rhs.b; c += rhs.c;
+    d += rhs.d; e += rhs.e; f += rhs.f;
+    g += rhs.g; h += rhs.h; i += rhs.i;
+
+    return *this;
+}
+mat3x3& mat3x3::operator -= (const mat3x3& rhs)
+{
+    a -= rhs.a; b -= rhs.b; c -= rhs.c;
+    d -= rhs.d; e -= rhs.e; f -= rhs.f;
+    g -= rhs.g; h -= rhs.h; i -= rhs.i;
+
+    return *this;
+}
+
+mat3x3& mat3x3::operator *= (const mat3x3& rhs)
+{
+    return *this = mat3x3( (a * rhs.a) + (b * rhs.d) + (c * rhs.g),
+                           (a * rhs.b) + (b * rhs.e) + (c * rhs.h),
+                           (a * rhs.c) + (b * rhs.f) + (c * rhs.i),
+                           (d * rhs.a) + (e * rhs.d) + (f * rhs.g),
+                           (d * rhs.b) + (e * rhs.e) + (f * rhs.h),
+                           (d * rhs.c) + (e * rhs.f) + (f * rhs.i),
+                           (g * rhs.a) + (h * rhs.d) + (i * rhs.g),
+                           (g * rhs.b) + (h * rhs.e) + (i * rhs.h),
+                           (g * rhs.c) + (h * rhs.f) + (i * rhs.i) );
+}
+mat3x3& mat3x3::operator *= (float rhs)
+{
+    a *= rhs; b *= rhs; c *= rhs;
+    d *= rhs; e *= rhs; f *= rhs;
+    g *= rhs; h *= rhs; i *= rhs;
+
+    return *this;
+}
+
+// Arithmetic operators
+mat3x3 mat3x3::operator + (const mat3x3& rhs) const { return mat3x3(*this) += rhs; }
+mat3x3 mat3x3::operator - (const mat3x3& rhs) const { return mat3x3(*this) -= rhs; }
+mat3x3 mat3x3::operator * (const mat3x3& rhs) const { return mat3x3(*this) *= rhs; }
+
+vec3 mat3x3::operator * (const vec3& rhs) const
+{
+    return vec3( (a * rhs.x) + (b * rhs.y) + (c * rhs.z),
+                 (d * rhs.x) + (e * rhs.y) + (f * rhs.z),
+                 (g * rhs.x) + (h * rhs.y) + (i * rhs.z) );
+}
+
+mat3x3 operator * (const mat3x3& lhs, float rhs) { return mat3x3(lhs) *= rhs; }
+mat3x3 operator * (float lhs, const mat3x3& rhs) { return mat3x3(rhs) *= lhs; }
+
+// Member functions
+float  mat3x3::determinant() const
+{
+    return (a*e*i) + (b*f*g) + (c*d*h) - (c*e*g) - (b*d*i) - (a*f*h); 
+}
+mat3x3 mat3x3::inverse()     const
+{
+    float det = determinant();
+    return adjugate() * ( 1.0f / det );
+}
+mat3x3 mat3x3::adjugate()    const
+{
+   return mat3x3(  (e*i) - (f*h) ,
+                 -((b*i) - (c*h)),
+                   (b*f) - (c*e) ,
+                 -((d*i) - (f*g)),
+                   (a*i) - (c*g) ,
+                 -((a*f) - (c*d)),
+                   (d*h) - (e*g) ,
+                 -((a*h) - (b*g)),
+                   (a*e) - (b*d)  );
+}
+mat3x3 mat3x3::transpose()   const
+{
+    return mat3x3( a, d, g,
+                   b, e, h,
+                   c, f, i );
+}
+

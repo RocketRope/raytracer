@@ -2,6 +2,7 @@
 #define _VMATH_H_
 
 #include <ostream>
+#include <iomanip>
 
 const float PI = 3.1415927;
 
@@ -102,20 +103,21 @@ class vec3
 
 class mat2x2
 {
+    //   2x2 
+    // [ a b ]
+    // [ c d ] 
+    //   u v
+
     public:
 
-        float a = 1.0f;  //   2x2 
-        float b = 0.0f;  // [ a b ] 
-        float c = 0.0f;  // [ c d ] 
-        float d = 1.0f;  //   v u
+        float a = 1.0f, b = 0.0f;
+        float c = 0.0f, d = 1.0f;
 
         // Constructors
-        mat2x2( float _a = 1.0f, 
-                float _b = 0.0f, 
-                float _c = 0.0f, 
-                float _d = 1.0f );
-        mat2x2(const vec2& v, const vec2& u);
-        mat2x2(const mat2x2& _matrix);
+        mat2x2( float _a = 1.0f, float _b = 0.0f, 
+                float _c = 0.0f, float _d = 1.0f );
+        mat2x2(const vec2& u, const vec2& v);
+        mat2x2(const mat2x2& _mat);
 
         // Assignment operators
         mat2x2& operator  = (const mat2x2& rhs);
@@ -132,7 +134,7 @@ class mat2x2
 
         vec2 operator * (const vec2& rhs) const;
 
- friend mat2x2 operator * (const mat2x2& lsh, float rhs);
+ friend mat2x2 operator * (const mat2x2& lhs, float rhs);
  friend mat2x2 operator * (float lhs, const mat2x2& rhs);
 
         // Member functions
@@ -144,6 +146,59 @@ class mat2x2
         {
             return os << "[ " << rhs.a << " " << rhs.b << " "
                       << "| " << rhs.c << " " << rhs.d << " ]";
+        }
+};
+
+class mat3x3
+{
+    //    3x3
+    // [ a b c]
+    // [ d e f]
+    // [ g h i] 
+    //   u v w
+    
+    public:
+
+        float a = 1.0f, b = 0.0f, c = 0.0f;
+        float d = 0.0f, e = 1.0f, f = 0.0f;
+        float g = 0.0f, h = 0.0f, i = 1.0f;
+
+        // Constructors
+        mat3x3( float _a = 1.0f, float _b = 0.0f, float _c = 0.0f, 
+                float _d = 0.0f, float _e = 1.0f, float _f = 0.0f,
+                float _g = 0.0f, float _h = 0.0f, float _i = 1.0f );
+        mat3x3(const vec3& u, const vec3& v, const vec3& w);
+        mat3x3(const mat3x3& _mat);
+
+        // Assignment operators
+        mat3x3& operator  = (const mat3x3& rhs);
+        mat3x3& operator += (const mat3x3& rhs);
+        mat3x3& operator -= (const mat3x3& rhs);
+
+        mat3x3& operator *= (const mat3x3& rhs);
+        mat3x3& operator *= (float rhs);
+
+        // Arithmetic operators
+        mat3x3 operator + (const mat3x3& rhs) const;
+        mat3x3 operator - (const mat3x3& rhs) const;
+        mat3x3 operator * (const mat3x3& rhs) const;
+
+        vec3 operator * (const vec3& rhs) const;
+
+ friend mat3x3 operator * (const mat3x3& lhs, float rhs);
+ friend mat3x3 operator * (float lhs, const mat3x3& rhs);
+
+        // Member functions
+        float  determinant() const;
+        mat3x3 adjugate()    const;
+        mat3x3 inverse()     const;
+        mat3x3 transpose()   const;
+
+ friend std::ostream& operator << (std::ostream& os, const mat3x3 rhs)
+        {
+            return os << "[ " << rhs.a << " " << rhs.b << " " << rhs.c << " "
+                      << "| " << rhs.d << " " << rhs.e << " " << rhs.f << " "
+                      << "| " << rhs.g << " " << rhs.h << " " << rhs.i << " ]";
         }
 };
 
