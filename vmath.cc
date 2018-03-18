@@ -16,11 +16,11 @@ bool equal_floats(float lhs, float rhs)
 }
 float radian_to_degree(float rad)
 {
-    return (rad / PI ) * 360;
+    return (rad / PI ) * 180.0f;
 }
 float degree_to_radian(float deg)
 {
-    return (deg / 360) * PI;
+    return (deg / 180.0f) * PI;
 }
 
 
@@ -331,9 +331,9 @@ mat2x2 mat2x2::transpose() const
 //  --  class mat3x3  --  //
 
 //     3x3
-//  [ a b c]
-//  [ d e f]
-//  [ g h i]
+//  [ a b c ]
+//  [ d e f ]
+//  [ g h i ]
 //    u v w
 
 mat3x3::mat3x3( float _a, float _b, float _c, 
@@ -442,3 +442,27 @@ mat3x3 mat3x3::transpose()   const
                    c, f, i );
 }
 
+
+
+//  -- STD ostream  --  //
+
+std::ostream& operator << (std::ostream& os, const vec2& rhs) 
+{
+    return os << "[" << rhs.x << " " << rhs.y << "]";
+}
+std::ostream& operator << (std::ostream& os, const vec3& rhs) 
+{
+    return os << "[" << rhs.x << " " << rhs.y << " " << rhs.z << "]";
+}
+
+std::ostream& operator << (std::ostream& os, const mat2x2 rhs)
+{
+    return os << "[ " << rhs.a << " " << rhs.b << " "
+              << "| " << rhs.c << " " << rhs.d << " ]";
+}
+std::ostream& operator << (std::ostream& os, const mat3x3 rhs)
+{
+    return os << "[ " << rhs.a << " " << rhs.b << " " << rhs.c << " "
+              << "| " << rhs.d << " " << rhs.e << " " << rhs.f << " "
+              << "| " << rhs.g << " " << rhs.h << " " << rhs.i << " ]";
+}

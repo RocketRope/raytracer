@@ -13,11 +13,15 @@ float degree_to_radian(float deg);
 
 class vec2
 {
+    //  2x1
+    // [ x ]
+    // [ y ]
+    //   v
+
     public:
-                         //  2x1
-        float x = 0.0f;  // [ x ]
-        float y = 0.0f;  // [ y ]
-                         //   v
+
+        float x = 0.0f;
+        float y = 0.0f;
 
         // Constructors
         vec2(float _x = 0.0f, float _y = 0.0f);
@@ -48,21 +52,22 @@ class vec2
         float angle_to  (const vec2& rhs) const;
         vec2  projection(const vec2& rhs) const;
 
-        // --  Std ostream  --  //
- friend std::ostream& operator << (std::ostream& os, vec2 rhs) 
-        {
-            return os << "[" << rhs.x << " " << rhs.y << "]";
-        }
 };
 
 class vec3
 {
+    //  3x1
+    // [ x ]
+    // [ y ]
+    // [ z ]
+    //   v
+
     public:
-                         //  3x1
-        float x = 0.0f;  // [ x ]
-        float y = 0.0f;  // [ y ]
-        float z = 0.0f;  // [ z ]
-                         //   v
+
+        float x = 0.0f;
+        float y = 0.0f;
+        float z = 0.0f;
+
 
         // Constructors
         vec3(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f);
@@ -94,18 +99,13 @@ class vec3
         vec3  projection(const vec3& rhs) const;
         vec3  cross_product(const vec3& rhs) const;
 
-        // --  Std ostream  --  //
- friend std::ostream& operator << (std::ostream& os, vec3 rhs) 
-        {
-            return os << "[" << rhs.x << " " << rhs.y << " " << rhs.z << "]";
-        }
 };
 
 class mat2x2
 {
-    //   2x2 
+    //   2x2
     // [ a b ]
-    // [ c d ] 
+    // [ c d ]
     //   u v
 
     public:
@@ -142,19 +142,14 @@ class mat2x2
         mat2x2 inverse()     const;
         mat2x2 transpose()   const;
 
- friend std::ostream& operator << (std::ostream& os, const mat2x2 rhs)
-        {
-            return os << "[ " << rhs.a << " " << rhs.b << " "
-                      << "| " << rhs.c << " " << rhs.d << " ]";
-        }
 };
 
 class mat3x3
 {
     //    3x3
-    // [ a b c]
-    // [ d e f]
-    // [ g h i] 
+    // [ a b c ]
+    // [ d e f ]
+    // [ g h i ] 
     //   u v w
     
     public:
@@ -194,13 +189,15 @@ class mat3x3
         mat3x3 inverse()     const;
         mat3x3 transpose()   const;
 
- friend std::ostream& operator << (std::ostream& os, const mat3x3 rhs)
-        {
-            return os << "[ " << rhs.a << " " << rhs.b << " " << rhs.c << " "
-                      << "| " << rhs.d << " " << rhs.e << " " << rhs.f << " "
-                      << "| " << rhs.g << " " << rhs.h << " " << rhs.i << " ]";
-        }
 };
+
+
+//  -- STD ostream  --  //
+
+std::ostream& operator << (std::ostream& os, const vec2& rhs);
+std::ostream& operator << (std::ostream& os, const vec3& rhs);
+std::ostream& operator << (std::ostream& os, const mat2x2& rhs);
+std::ostream& operator << (std::ostream& os, const mat3x3& rhs);
 
 
 #endif // _VMATH_H_
