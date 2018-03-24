@@ -1,44 +1,48 @@
-#ifndef _SHAPE_H_
-#define _SHAPE_H_
+#ifndef _Shape_H_
+#define _Shape_H_
 
 #include "vmath.h"
+#include "material.h"
 
-class ray
+class Ray
 {
     public:
 
-        vec3 dir = vec3(1.0f, 0.0f, 0.0f);
-        vec3 ori = vec3(0.0f, 0.0f, 0.0f);
+        Vec3 dir = Vec3(1.0f, 0.0f, 0.0f);
+        Vec3 ori = Vec3(0.0f, 0.0f, 0.0f);
 
         // Constructors
-        ray(const vec3& _dir = vec3(1.0f, 0.0f, 0.0f), 
-            const vec3& _ori = vec3{0.0f, 0.0f, 0.0f});
+        Ray(const Vec3& _dir = Vec3(1.0f, 0.0f, 0.0f), 
+            const Vec3& _ori = Vec3{0.0f, 0.0f, 0.0f});
 
 };
 
-class shape
+class Shape
 {
     public:
 
-        virtual ~shape() {}
+        Color color = Color(0x9E9E9E);
 
-        virtual bool intersect(const ray& ray, float& depth) const = 0; 
+        virtual Shape(Color _color = Color(0x9E9E9E));
+        virtual ~Shape() {}
+
+        virtual bool intersect(const Ray& ray, float& depth) const = 0; 
 };
 
-class sphere : public shape
+class Sphere : public Shape
 {
     public:
 
-        vec3  center = vec3(0.0f, 0.0f, 0.0f);
+        Vec3  center = Vec3(0.0f, 0.0f, 0.0f);
         float radius = 1.0f;
 
         // Constructors
-        sphere(const vec3& _center = vec3(0.0f, 0.0f, 0.0f),
+        Sphere(const Vec3& _center = Vec3(0.0f, 0.0f, 0.0f),
                      float _radius = 1.0f );
 
         // Override functions
-        bool intersect(const ray& ray, float& point) const override;
+        bool intersect(const Ray& ray, float& point) const override;
 
 };
 
-#endif // _SHAPE_H_
+#endif // _Shape_H_

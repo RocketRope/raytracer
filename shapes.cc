@@ -7,22 +7,20 @@
 //  --  class ray  --  //
 
 // Constructors
-ray::ray(const vec3& _dir, const vec3& _ori)
+Ray::Ray(const Vec3& _dir, const Vec3& _ori)
     : dir{_dir} , ori{_ori} {}
 
 
-
-
-//  --  class sphere  --  //
+//  --  class Sphere  --  //
 
 // Constructors
-sphere::sphere(const vec3& _center, float _radius)
+Sphere::Sphere(const Vec3& _center, float _radius)
     : center{_center} , radius{_radius} {}
 
 // Override functions
-bool sphere::intersect(const ray& ray, float& depth) const
+bool Sphere::intersect(const Ray& ray, float& depth) const
 {
-    vec3  v = ray.ori - center;
+    Vec3  v = ray.ori - center;
     float ray_dot_v = ray.dir * v;
     
     float x = (ray_dot_v * ray_dot_v) - (v * v) + (radius * radius);
