@@ -72,21 +72,22 @@ void Raytracer::add(Shape* p_shape)
 
 unsigned char* Raytracer::render() const
 {
+    Timer render_time("Render time", std::cout);
+    
     int index = 0;
-
     for ( int y = 0 ; y < height ; y++ )
     {
         for ( int x = 0 ; x < width ; x++ )
         {
             Ray ray = camera.get_primary_ray(x, y);
-            frame[index++] = trace_ray(ray);
+            frame[index++] = cast_ray(ray);
         }
     }
 
     return (unsigned char*) frame;
 }
 
-Color Raytracer::trace_ray(const Ray& ray) const
+Color Raytracer::cast_ray(const Ray& ray) const
 {
     float  closest_depth = std::numeric_limits<float>::max();
     Shape* closest_shape = nullptr;
@@ -106,7 +107,7 @@ Color Raytracer::trace_ray(const Ray& ray) const
 
     if ( closest_shape != nullptr )
     {
-        Vec3 point  = ray.dir * depth;
+        Vec3 point  = ray.dir * closest_depth;
         Vec3 normal = closest_shape->get_normal(point);
         
         output_color = closest_shape->color;

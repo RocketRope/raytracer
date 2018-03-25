@@ -6,6 +6,38 @@
 #include "vmath.h"
 #include "shapes.h"
 
+#include <string>
+#include <chrono>
+#include <iostream>
+
+class Timer
+{
+    private:
+
+        std::string msg;
+        std::chrono::high_resolution_clock::time_point start_point;
+
+        std::ostream& os;
+
+    public:
+
+        Timer(const std::string& _msg = "Timer", std::ostream& _os = std::cout )
+            : msg{_msg} , os{_os}
+        {
+            start_point = std::chrono::high_resolution_clock::now();
+        }
+
+        ~Timer()
+        {
+            std::chrono::high_resolution_clock::time_point end_point;
+            end_point = std::chrono::high_resolution_clock::now();
+
+            std::chrono::duration<double> delta_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_point - start_point);
+
+            os << msg << " : " << delta_time.count() << "s" << std::endl; 
+        }
+};
+
 class Camera
 {
 
@@ -57,7 +89,7 @@ class Raytracer
         void  add(Shape* p_shape);
         unsigned char* render() const;
 
-        Color trace_ray(const Ray& ray) const;
+        Color cast_ray(const Ray& ray) const;
 };
 
 #endif // _RAYTRACER_H_ 
