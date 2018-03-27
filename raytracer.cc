@@ -26,7 +26,7 @@ Camera::Camera(int _width, int _height, float _fov)
 
     image_plane_pixel_origin = Vec3 (-image_plane_width / 2.0f,
                                       image_plane_height / 2.0f,
-                                     -1.0f );
+                                      1.0f );
 
     image_plane_pixel_origin += offset_vec_width  * 0.5f;
     image_plane_pixel_origin += offset_vec_height * 0.5f;

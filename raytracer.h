@@ -3,40 +3,15 @@
 
 #include <vector>
 
-#include "vmath.h"
-#include "shapes.h"
-
 #include <string>
 #include <chrono>
 #include <iostream>
 
-class Timer
-{
-    private:
+#include <random>
+#include <limits>
 
-        std::string msg;
-        std::chrono::high_resolution_clock::time_point start_point;
-
-        std::ostream& os;
-
-    public:
-
-        Timer(const std::string& _msg = "Timer", std::ostream& _os = std::cout )
-            : msg{_msg} , os{_os}
-        {
-            start_point = std::chrono::high_resolution_clock::now();
-        }
-
-        ~Timer()
-        {
-            std::chrono::high_resolution_clock::time_point end_point;
-            end_point = std::chrono::high_resolution_clock::now();
-
-            std::chrono::duration<double> delta_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_point - start_point);
-
-            os << msg << " : " << delta_time.count() << "s" << std::endl; 
-        }
-};
+#include "vmath.h"
+#include "shapes.h"
 
 class Camera
 {
@@ -91,5 +66,66 @@ class Raytracer
 
         Color cast_ray(const Ray& ray) const;
 };
+
+
+
+class Timer
+{
+    private:
+
+        std::string msg;
+        std::chrono::high_resolution_clock::time_point start_point;
+
+        std::ostream& os;
+
+    public:
+
+        Timer(const std::string& _msg = "Timer", std::ostream& _os = std::cout )
+            : msg{_msg} , os{_os}
+        {
+            start_point = std::chrono::high_resolution_clock::now();
+        }
+
+        ~Timer()
+        {
+            std::chrono::high_resolution_clock::time_point end_point;
+            end_point = std::chrono::high_resolution_clock::now();
+
+            std::chrono::duration<double> delta_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_point - start_point);
+
+            os << std::endl << msg << " : " << delta_time.count() << "s" << std::endl; 
+        }
+};
+
+
+template < typename T >
+class Random
+{
+    private:
+
+        std::default_random_engine device;
+        std::uniform_real_distribution<double> dist;
+
+    public:
+
+        Random( T low = std::numeric_limits<T>::min() , T high = std::numeric_limits<T>::max() )
+            : dist{ (double) low , (double) high}
+        {
+            device.seed( std::chrono::system_clock::now().time_since_epoch().count() );
+        }
+
+        T operator () (void) 
+        {
+            return (T) dist(device);
+        }
+};
+
+template < typename U , typename T >
+U normalize_cast(T number, 
+                 T min = std::numeric_limits<T>::min(),
+                 T max = std::numberc_limits<T>::max() )
+{
+    U output;
+}
 
 #endif // _RAYTRACER_H_ 

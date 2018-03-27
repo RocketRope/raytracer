@@ -31,6 +31,7 @@ float Sphere::intersect(const Ray& ray) const
     
     float x = (ray_dot_v * ray_dot_v) - (v * v) + (radius * radius);
 
+    // Ray never intersect sphere
     if ( x < 0.0f )
         return -1.0f;
 
@@ -41,9 +42,6 @@ float Sphere::intersect(const Ray& ray) const
 
     float depth = (d1 < d2) ?  d1 : d2;
 
-    if ( depth <= 0.0f)
-        return -1.0f;
-
     return depth;
 }
 
@@ -52,6 +50,35 @@ Vec3 Sphere::get_normal(const Vec3& point) const
     Vec3 normal = point - center;
     normal.normalize();
 
+    return normal;
+}
+
+//  --  class Plane  --  //
+
+Plane::Plane( const Vec3& _position, const Vec3& _normal )
+    : position{_position} 
+{
+    normal = _normal;
+    normal.normalize();
+}
+
+#include <iostream>
+
+// Override functions
+float Plane::intersect (const Ray& ray)   const 
+{
+    float y = ray.dir * normal;
+
+    // Plane and ray parallel
+    if ( y >= 0.0f )
+       return -1.0f;
+
+    float x = (position - ray.ori) * normal;
+
+    return x / y;
+}
+Vec3  Plane::get_normal(const Vec3& point) const
+{
     return normal;
 }
 

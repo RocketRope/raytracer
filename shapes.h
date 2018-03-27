@@ -74,11 +74,27 @@ class Sphere : public Shape
         float radius = 1.0f;
 
         // Constructors
-        Sphere(const Vec3& _center = Vec3(0.0f, 0.0f, 0.0f),
-                     float _radius = 1.0f );
+        Sphere( const Vec3& _center = Vec3(0.0f, 0.0f, 0.0f),
+                      float _radius = 1.0f );
 
         // Override functions
         float intersect (const Ray& ray)    const override;
+        Vec3  get_normal(const Vec3& point) const override;
+};
+
+class Plane : public Shape
+{
+    public:
+
+        Vec3 position = Vec3(0.0f, 0.0f ,0.0f); 
+        Vec3 normal   = Vec3(0.0f ,1.0f, 0.0f);
+
+        // Constructors
+        Plane( const Vec3& _position = Vec3(0.0f, 0.0f, 0.0f),
+               const Vec3& _normal   = Vec3(0.0f, 1.0f, 0.0f) );
+
+        // Override functions
+        float intersect (const Ray& ray)   const override;
         Vec3  get_normal(const Vec3& point) const override;
 };
 
