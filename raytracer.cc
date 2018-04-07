@@ -3,6 +3,7 @@
 #include <cmath>
 #include <limits>
 
+
 //  --  class Camera  --  //
 
 // Constructors
@@ -44,6 +45,7 @@ Ray Camera::get_primary_ray(int x, int y) const
     return Ray(dir, position);
 }
 
+
 //  --  class Raytracer  --  //
 
 // Constructors
@@ -51,7 +53,10 @@ Raytracer::Raytracer(int _width, int _height)
     : width{_width} , height{_height} ,
       camera{_width , _height , 45.0f}
 {
-    frame = new Color[width * height];
+    frame = new uint8_t[width * height * 4];
+
+    ambient_color    = Color(0.1f, 0.1f, 0.14f);
+    background_color = Color(0.0f, 0.0f, 0.0f);
 }
 // Destructor
 Raytracer::~Raytracer()
@@ -69,6 +74,11 @@ void Raytracer::add(Shape* p_shape)
     if ( p_shape != nullptr )
         shapes.push_back(p_shape);
 }
+void Raytracer::add(Light* p_light)
+{
+    if ( p_light != nullptr )
+        lights.push_back(p_light);
+}
 
 unsigned char* Raytracer::render() const
 {
@@ -79,8 +89,13 @@ unsigned char* Raytracer::render() const
     {
         for ( int x = 0 ; x < width ; x++ )
         {
-            Ray ray = camera.get_primary_ray(x, y);
-            frame[index++] = cast_ray(ray);
+            Ray primary_ray = camera.get_primary_ray(x, y);
+            Color color = cast_ray(primary_ray);
+            
+            frame[index++] = color.red   * 255.0f;
+            frame[index++] = color.green * 255.0f;
+            frame[index++] = color.blue  * 255.0f;
+            frame[index++] = 0xFF;
         }
     }
 
@@ -89,29 +104,89 @@ unsigned char* Raytracer::render() const
 
 Color Raytracer::cast_ray(const Ray& ray) const
 {
-    float  closest_depth = std::numeric_limits<float>::max();
+    float  closest_depth = 0.0f;
+    Shape* closest_shape = intersection_closest(ray, closest_depth);
+
+    Color output_color(0.0f, 0.0f, 0.0f);
+
+    if ( closest_shape == nullptr )
+    {
+        output_color = background_color;
+    }
+    else
+    {
+        Vec3  point  = ray.dir * closest_depth;
+        Vec3  normal = closest_shape->get_normal(point);
+        Color color  = closest_shape->color;
+
+        for ( Light* light : lights )
+        {
+            Vec3  light_direction = light->get_direction(point);
+            float incident = normal * (-light_direction);
+
+            if ( incident > 0.0f )
+            {
+                // Shadow
+                 Ray   shadow_ray(-light_direction, point);
+                float shadow_depth;
+                
+                Shape* closest_shape_shadow = intersection_closest( shadow_ray,
+                                                                    shadow_depth,
+                                                                    closest_shape );
+
+                float light_distance = light->get_distance(point);
+                if( ( closest_shape_shadow == nullptr ) || ( shadow_depth > light_distance ))
+                {
+                    // Diffuse
+                    output_color += incident * light->color * closest_shape->color;
+
+                    // Specular
+                    Vec3 light_reflection = light_direction + ( 2.0f * incident * normal );
+                    output_color += std::pow(ray.dir * light_reflection, 20.0f) * light->color;    
+                }
+            }
+        }
+
+        output_color += ambient_color;
+    }
+
+    output_color.red   = ( output_color.red   > 1.0f ) ? 1.0f : output_color.red;
+    output_color.green = ( output_color.green > 1.0f ) ? 1.0f : output_color.green;
+    output_color.blue  = ( output_color.blue  > 1.0f ) ? 1.0f : output_color.blue;
+
+
+    return output_color;
+}
+
+bool Raytracer::intersection_exist(const Ray& ray, Shape* ignore_shape ) const
+{
+    for ( Shape* shape : shapes )
+        if ( shape != ignore_shape )
+            if ( shape->intersect(ray) > 0.0f )
+                return true;
+    
+    return false;
+}
+Shape* Raytracer::intersection_closest( const Ray& ray, 
+                                        float& closest_depth, 
+                                        Shape* ignore_shape ) const
+{
     Shape* closest_shape = nullptr;
+    closest_depth = std::numeric_limits<float>::max();
 
     for ( Shape* shape : shapes )
     {
-        float depth = shape->intersect(ray);
-
-        if ( ( depth > 0.0f ) && ( depth < closest_depth) )
+        if ( shape != ignore_shape )
         {
-            closest_depth = depth;
-            closest_shape = shape;
+            float depth = shape->intersect(ray);
+
+            if ( ( depth > 0.0f ) && ( depth < closest_depth) )
+            {
+                closest_depth = depth;
+                closest_shape = shape;
+            }
         }
     }
 
-    Color output_color(Color::TRANSPARENT);
-
-    if ( closest_shape != nullptr )
-    {
-        Vec3 point  = ray.dir * closest_depth;
-        Vec3 normal = closest_shape->get_normal(point);
-        
-        output_color = closest_shape->color;
-    }
-
-    return output_color;
+    return closest_shape;
 }

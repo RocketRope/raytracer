@@ -12,6 +12,7 @@
 
 #include "vmath.h"
 #include "shapes.h"
+#include "lights.h"
 
 class Camera
 {
@@ -46,12 +47,15 @@ class Raytracer
 
         int width;
         int height;
-        Color* frame;
+        uint8_t* frame;
 
         Camera camera;
 
         std::vector<Shape*> shapes;
+        std::vector<Light*> lights;
 
+        Color ambient_color;
+        Color background_color;
 
     public:
 
@@ -61,13 +65,17 @@ class Raytracer
         ~Raytracer();
 
         // Member functions
-        void  add(Shape* p_shape);
+        void add(Shape* p_shape);
+        void add(Light* p_light);
         unsigned char* render() const;
 
         Color cast_ray(const Ray& ray) const;
+
+        bool   intersection_exist(const Ray& ray, Shape* ignore_shape = nullptr) const;
+        Shape* intersection_closest( const Ray& ray, 
+                                     float& closest_depth, 
+                                     Shape* ignore_shape = nullptr ) const;
 };
-
-
 
 class Timer
 {
@@ -91,7 +99,7 @@ class Timer
             std::chrono::high_resolution_clock::time_point end_point;
             end_point = std::chrono::high_resolution_clock::now();
 
-            std::chrono::duration<double> delta_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_point - start_point);
+            std::chrono::duration<double> delta_time = end_point - start_point;
 
             os << std::endl << msg << " : " << delta_time.count() << "s" << std::endl; 
         }
@@ -120,12 +128,5 @@ class Random
         }
 };
 
-template < typename U , typename T >
-U normalize_cast(T number, 
-                 T min = std::numeric_limits<T>::min(),
-                 T max = std::numberc_limits<T>::max() )
-{
-    U output;
-}
 
 #endif // _RAYTRACER_H_ 

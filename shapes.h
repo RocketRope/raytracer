@@ -5,21 +5,74 @@
 
 struct Color
 {
-    uint8_t red   = 0x00;
-    uint8_t green = 0x00;
-    uint8_t blue  = 0x00;
-    uint8_t alpha = 0xFF;
+    public:
+        
+        float red   = 0.0f;
+        float green = 0.0f;
+        float blue  = 0.0f;
 
-    Color() = default;
-    Color(uint32_t hex)
-    {
-        uint8_t* p_hex = (uint8_t*) &hex;
+        Color() = default;
+        Color(const Color& _color) = default;
+        Color(float r, float g, float b)
+            : red{r} , green{g} , blue{b} {}
+        Color(uint32_t hex)
+        {
+            uint8_t* p_hex = (uint8_t*) &hex;
 
-        red   = p_hex[3];
-        green = p_hex[2];
-        blue  = p_hex[1];
-        alpha = p_hex[0];
-    }
+            red   = p_hex[3] / 255.0f;
+            green = p_hex[2] / 255.0f;
+            blue  = p_hex[1] / 255.0f;
+        }
+
+        Color& operator =  (const Color& rhs)
+        {
+            red   = rhs.red;
+            green = rhs.green;
+            blue  = rhs.blue;
+        }
+
+        Color& operator *= (float rhs)
+        {
+            red   *= rhs;
+            green *= rhs;
+            blue  *= rhs;
+
+            return *this;
+        }
+
+        Color& operator *= (const Color& rhs)
+        {
+            red   *= rhs.red;
+            green *= rhs.green;
+            blue  *= rhs.blue;
+
+            return *this;
+        }
+
+        Color& operator += (const Color& rhs)
+        {
+            red   += rhs.red;
+            green += rhs.green;
+            blue  += rhs.blue;
+
+            return *this;
+        }
+
+        Color& operator -= (const Color& rhs)
+        {
+            red   -= rhs.red;
+            green -= rhs.green;
+            blue  -= rhs.blue;
+
+            return *this;
+        }
+
+        Color operator * (const Color& rhs) { return Color(*this) *= rhs; }
+        Color operator + (const Color& rhs) { return Color(*this) += rhs; }
+        Color operator - (const Color& rhs) { return Color(*this) -= rhs; }
+
+ friend Color operator * (const Color& lhs, float rhs) { return Color(lhs) *= rhs; }
+ friend Color operator * (float lhs, const Color& rhs) { return Color(rhs) *= lhs; }
 
     static const uint32_t RED    = 0xEC4339FF;
     static const uint32_t YELLOW = 0xEFB920FF;
@@ -36,7 +89,6 @@ struct Color
     static const uint32_t BLACK      = 0x000000FF;
 
     static const uint32_t TRANSPARENT = 0x00000000;
-
 };
 
 class Ray
@@ -57,11 +109,13 @@ class Shape
 
         Color color;
 
-        Shape(const Color& _color = Color(Color::ORANGE));
-        Shape(const Shape& _shape)
-            : color{_shape.color} {}
+        // Constructors
+        Shape(const Shape& _shape) = default;
+        Shape(const Color& _color = Color(Color::LIGHT_GRAY));
+        // Destructor
         virtual ~Shape() {}
  
+        // Pure Virutal functions
         virtual float intersect (const Ray& ray)    const = 0;
         virtual Vec3  get_normal(const Vec3& point) const = 0;
 };
@@ -74,8 +128,9 @@ class Sphere : public Shape
         float radius = 1.0f;
 
         // Constructors
-        Sphere( const Vec3& _center = Vec3(0.0f, 0.0f, 0.0f),
-                      float _radius = 1.0f );
+        Sphere(const Sphere& _sphere) = default;
+        Sphere(const Vec3& _center = Vec3(0.0f, 0.0f, 0.0f),
+                     float _radius = 1.0f );
 
         // Override functions
         float intersect (const Ray& ray)    const override;
@@ -90,6 +145,7 @@ class Plane : public Shape
         Vec3 normal   = Vec3(0.0f ,1.0f, 0.0f);
 
         // Constructors
+        Plane(const Plane& _plane) = default;
         Plane( const Vec3& _position = Vec3(0.0f, 0.0f, 0.0f),
                const Vec3& _normal   = Vec3(0.0f, 1.0f, 0.0f) );
 

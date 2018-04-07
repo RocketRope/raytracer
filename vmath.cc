@@ -75,6 +75,8 @@ Vec2 Vec2::operator - (const Vec2& rhs)      const { return Vec2(*this) -= rhs; 
 Vec2 operator * (const Vec2& lhs, float rhs)       { return Vec2(lhs)   *= rhs; }
 Vec2 operator * (float lhs, const Vec2& rhs)       { return rhs * lhs; }
 
+Vec2 Vec2::operator - () const { return Vec2(*this) *= -1.0f;}
+
 // Dot product
 float Vec2::operator * (const Vec2& rhs) const
 {
@@ -182,6 +184,8 @@ Vec3 Vec3::operator + (const Vec3& rhs)      const { return Vec3(*this) += rhs; 
 Vec3 Vec3::operator - (const Vec3& rhs)      const { return Vec3(*this) -= rhs; }
 Vec3 operator * (const Vec3& lhs, float rhs)       { return Vec3(lhs)   *= rhs; }
 Vec3 operator * (float lhs, const Vec3& rhs)       { return rhs * lhs; }
+
+Vec3 Vec3::operator - () const { return Vec3(*this) *= -1.0f; }
 
 // Dot product
 float Vec3::operator * (const Vec3& rhs) const

@@ -40,6 +40,8 @@ class Vec2
  friend Vec2 operator * (const Vec2& lhs, float rhs);
  friend Vec2 operator * (float lhs, const Vec2& rhs);
 
+        Vec2 operator - () const;
+
         // Dot product
         float operator * (const Vec2& rhs) const;
 
@@ -85,6 +87,8 @@ class Vec3
 
  friend Vec3 operator * (const Vec3& lhs, float rhs);
  friend Vec3 operator * (float lhs, const Vec3& rhs);
+
+        Vec3 operator - () const;
 
         // Dot product
         float operator * (const Vec3& rhs) const;
