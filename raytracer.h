@@ -54,8 +54,8 @@ class Raytracer
         std::vector<Shape*> shapes;
         std::vector<Light*> lights;
 
-        Color ambient_color;
-        Color background_color;
+        Color ambient;
+        Color background;
 
     public:
 
@@ -64,17 +64,44 @@ class Raytracer
         // Destructor
         ~Raytracer();
 
-        // Member functions
+        // Public Member functions
         void add(Shape* p_shape);
         void add(Light* p_light);
-        unsigned char* render() const;
 
+        unsigned char* render() const;
         Color cast_ray(const Ray& ray) const;
 
-        bool   intersection_exist(const Ray& ray, Shape* ignore_shape = nullptr) const;
+    private: 
+
+        // Private Member functions
         Shape* intersection_closest( const Ray& ray, 
                                      float& closest_depth, 
                                      Shape* ignore_shape = nullptr ) const;
+
+        bool point_in_shadow( const Light* light,
+                              const Vec3&  light_direction,
+                              const Vec3&  point ) const;
+
+        Color shade_point( const Ray& ray,
+                           const Vec3& point,
+                           const Vec3& normal,
+                           const Material& material ) const;
+
+        Color shade_diffuse( float incident,
+                             const Light* light,
+                             const Material& material ) const;
+        
+        Color shade_specular( float incident,
+                              const Vec3& normal,
+                              const Ray& ray,
+                              const Light* light,
+                              const Vec3& light_direction,
+                              const Material& material ) const;
+
+        Color shade_reflection( const Ray& ray,
+                                const Vec3& normal,
+                                const Vec3& point,
+                                const Material& material ) const;
 };
 
 class Timer

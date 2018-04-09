@@ -24,9 +24,10 @@ class Vec2
         float y = 0.0f;
 
         // Constructors
-        Vec2(float _x = 0.0f, float _y = 0.0f);
         Vec2(const Vec2& _vec);
-
+        explicit Vec2(float _x = 0.0f, float _y = 0.0f)
+                     : x{_x} , y{_y} {}
+        
         // Assignment operators
         Vec2& operator  = (const Vec2& rhs);
         Vec2& operator += (const Vec2& rhs);
@@ -72,9 +73,10 @@ class Vec3
 
 
         // Constructors
-        Vec3(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f);
         Vec3(const Vec3& _vec);
-
+        explicit Vec3(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f)
+                     : x{_x} , y{_y} , z{_z} {}
+        
         // Assignment operators
         Vec3& operator  = (const Vec3& rhs);
         Vec3& operator += (const Vec3& rhs);
@@ -118,10 +120,15 @@ class Mat2x2
         float c = 0.0f, d = 1.0f;
 
         // Constructors
-        Mat2x2( float _a = 1.0f, float _b = 0.0f, 
-                float _c = 0.0f, float _d = 1.0f );
-        Mat2x2(const Vec2& u, const Vec2& v);
+        
         Mat2x2(const Mat2x2& _mat);
+        explicit Mat2x2(const Vec2& u, const Vec2& v)
+                       : a{u.x} , b{v.x}, 
+                         c{u.y} , d{v.y}  {}
+        explicit Mat2x2( float _a = 1.0f, float _b = 0.0f, 
+                         float _c = 0.0f, float _d = 1.0f )
+                       : a{_a} , b{_b}, 
+                         c{_c} , d{_d}  {}
 
         // Assignment operators
         Mat2x2& operator  = (const Mat2x2& rhs);
@@ -163,11 +170,17 @@ class Mat3x3
         float g = 0.0f, h = 0.0f, i = 1.0f;
 
         // Constructors
-        Mat3x3( float _a = 1.0f, float _b = 0.0f, float _c = 0.0f, 
-                float _d = 0.0f, float _e = 1.0f, float _f = 0.0f,
-                float _g = 0.0f, float _h = 0.0f, float _i = 1.0f );
-        Mat3x3(const Vec3& u, const Vec3& v, const Vec3& w);
         Mat3x3(const Mat3x3& _mat);
+        explicit Mat3x3(const Vec3& u, const Vec3& v, const Vec3& w)
+                       : a{u.x} , b{v.x} , c{w.x},
+                         d{u.y} , e{v.y} , f{w.y},
+                         g{u.z} , h{v.z} , i{w.z}  {}
+        explicit Mat3x3( float _a = 1.0f, float _b = 0.0f, float _c = 0.0f, 
+                         float _d = 0.0f, float _e = 1.0f, float _f = 0.0f,
+                         float _g = 0.0f, float _h = 0.0f, float _i = 1.0f )
+                       : a{_a} , b{_b} , c{_c},
+                         d{_d} , e{_e} , f{_f},
+                         g{_g} , h{_h} , i{_i}  {}
 
         // Assignment operators
         Mat3x3& operator  = (const Mat3x3& rhs);

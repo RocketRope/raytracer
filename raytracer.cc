@@ -40,6 +40,7 @@ Ray Camera::get_primary_ray(int x, int y) const
                (offset_vec_width  * x)  + 
                (offset_vec_height * y);
 
+    dir -= position;
     dir.normalize();
 
     return Ray(dir, position);
@@ -55,8 +56,8 @@ Raytracer::Raytracer(int _width, int _height)
 {
     frame = new uint8_t[width * height * 4];
 
-    ambient_color    = Color(0.1f, 0.1f, 0.14f);
-    background_color = Color(0.0f, 0.0f, 0.0f);
+    ambient    = Color(0.1f, 0.1f, 0.13f);
+    background = Color(0x8b9dc300);
 }
 // Destructor
 Raytracer::~Raytracer()
@@ -104,69 +105,30 @@ unsigned char* Raytracer::render() const
 
 Color Raytracer::cast_ray(const Ray& ray) const
 {
+    Color output;
+
     float  closest_depth = 0.0f;
     Shape* closest_shape = intersection_closest(ray, closest_depth);
 
-    Color output_color(0.0f, 0.0f, 0.0f);
-
-    if ( closest_shape == nullptr )
+    if ( closest_shape != nullptr )
     {
-        output_color = background_color;
+        Vec3  point  = (ray.dir * closest_depth) + ray.ori;
+        Vec3  normal = closest_shape->get_normal(point);
+        
+        output = shade_point(ray, point, normal, closest_shape->material);
+
+        output.red   = ( output.red   > 1.0f ) ? 1.0f : output.red;
+        output.green = ( output.green > 1.0f ) ? 1.0f : output.green;
+        output.blue  = ( output.blue  > 1.0f ) ? 1.0f : output.blue;
     }
     else
     {
-        Vec3  point  = ray.dir * closest_depth;
-        Vec3  normal = closest_shape->get_normal(point);
-        Color color  = closest_shape->color;
-
-        for ( Light* light : lights )
-        {
-            Vec3  light_direction = light->get_direction(point);
-            float incident = normal * (-light_direction);
-
-            if ( incident > 0.0f )
-            {
-                // Shadow
-                 Ray   shadow_ray(-light_direction, point);
-                float shadow_depth;
-                
-                Shape* closest_shape_shadow = intersection_closest( shadow_ray,
-                                                                    shadow_depth,
-                                                                    closest_shape );
-
-                float light_distance = light->get_distance(point);
-                if( ( closest_shape_shadow == nullptr ) || ( shadow_depth > light_distance ))
-                {
-                    // Diffuse
-                    output_color += incident * light->color * closest_shape->color;
-
-                    // Specular
-                    Vec3 light_reflection = light_direction + ( 2.0f * incident * normal );
-                    output_color += std::pow(ray.dir * light_reflection, 20.0f) * light->color;    
-                }
-            }
-        }
-
-        output_color += ambient_color;
+        output = background;
     }
 
-    output_color.red   = ( output_color.red   > 1.0f ) ? 1.0f : output_color.red;
-    output_color.green = ( output_color.green > 1.0f ) ? 1.0f : output_color.green;
-    output_color.blue  = ( output_color.blue  > 1.0f ) ? 1.0f : output_color.blue;
-
-
-    return output_color;
+    return output;
 }
 
-bool Raytracer::intersection_exist(const Ray& ray, Shape* ignore_shape ) const
-{
-    for ( Shape* shape : shapes )
-        if ( shape != ignore_shape )
-            if ( shape->intersect(ray) > 0.0f )
-                return true;
-    
-    return false;
-}
 Shape* Raytracer::intersection_closest( const Ray& ray, 
                                         float& closest_depth, 
                                         Shape* ignore_shape ) const
@@ -189,4 +151,109 @@ Shape* Raytracer::intersection_closest( const Ray& ray,
     }
 
     return closest_shape;
+}
+
+bool Raytracer::shadow_test( const Light* light,
+                             const Vec3&  light_direction,
+                             const Vec3&  point ) const
+{
+    Ray   shadow_ray(light_direction, point);
+    float shadow_depth;
+    
+    Shape* closest_shape_shadow = intersection_closest( shadow_ray,
+                                                        shadow_depth );
+
+    float light_distance = light->get_distance(point);
+
+    return (closest_shape_shadow == nullptr ) || ( shadow_depth > light_distance);
+}
+
+
+Color Raytracer::shade_point( const Ray& ray,
+                              const Vec3& point,
+                              const Vec3& normal,
+                              const Material& material ) const
+{
+    Color diffuse;
+    Color specular;
+    Color reflection;
+
+    for ( Light* light : lights )
+    {
+        Vec3  light_direction = light->get_direction(point) * (-1.0f);
+        float incident = normal * light_direction;
+
+        if ( incident > 0.0f )
+        {
+            if( point_in_shadow(light, light_direction, point) )
+            {
+                diffuse  += shade_diffuse( incident,
+                                           light, 
+                                           material );
+
+                specular += shade_specular( incident,
+                                            normal,
+                                            ray,
+                                            light,
+                                            light_direction,
+                                            material );
+            }
+        }
+    }
+
+    reflection = shade_reflection( ray, normal, point, material);
+
+    return diffuse + specular + reflection + ( ambient * (1.0f - material.reflection));
+}
+
+Color Raytracer::shade_diffuse( float incident,
+                                const Light* light,
+                                const Material& material ) const
+{
+    if ( material.reflection < 1.0f )
+        return incident *
+               light->color *
+               material.color *
+               (1.0f - material.reflection);
+    
+    return Color(0.0f, 0.0f, 0.0f);
+}
+
+Color Raytracer::shade_specular( float incident,
+                                 const Vec3& normal,
+                                 const Ray& ray,
+                                 const Light* light,
+                                 const Vec3& light_direction,
+                                 const Material& material ) const
+{
+    if ( material.specular > 1.0f )
+    {
+        Vec3 light_reflection = light_direction - ( 2.0f * incident * normal );
+
+        float dot_reflection = ray.dir * light_reflection;
+
+        if ( dot_reflection > 0.0f )
+            return std::pow(dot_reflection, material.specular) * light->color;
+    }
+
+    return Color(0.0f, 0.0f, 0.0f);
+}
+
+Color Raytracer::shade_reflection( const Ray& ray,
+                                   const Vec3& normal,
+                                   const Vec3& point,
+                                   const Material& material ) const
+{
+    if ( material.reflection > 0.0f )
+    {
+        Vec3 reflection = ray.dir - (2.0f * (ray.dir * normal) * normal);
+
+        reflection.normalize(); // ????
+        
+        Ray ray_reflection(reflection, point);
+
+        return material.reflection * cast_ray(ray_reflection);
+    }
+
+    return Color(0.0f, 0.0f, 0.0f);
 }

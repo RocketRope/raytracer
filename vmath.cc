@@ -32,8 +32,6 @@ float degree_to_radian(float deg)
 //        v
 
 // Constructors
-Vec2::Vec2(float _x, float _y)
-    : x{_x} , y{_y} {}
 Vec2::Vec2(const Vec2& _vec)
 {
     this->operator=(_vec);
@@ -138,8 +136,6 @@ Vec2 Vec2::projection(const Vec2& rhs) const
 //        v
 
 // Constructors
-Vec3::Vec3(float _x, float _y, float _z)
-    : x{_x} , y{_y} , z{_z} {}
 Vec3::Vec3(const Vec3& _vec)
 {
     this->operator=(_vec);
@@ -252,13 +248,6 @@ Vec3  Vec3::cross_product(const Vec3& rhs) const
 //        u v
 
 // Constructors
-Mat2x2::Mat2x2( float _a, float _b, 
-                float _c, float _d )
-    : a{_a} , b{_b}, 
-      c{_c} , d{_d} {}
-Mat2x2::Mat2x2(const Vec2& u, const Vec2& v)
-    : a{u.x} , b{v.x}, 
-      c{u.y} , d{v.y} {}
 Mat2x2::Mat2x2(const Mat2x2& _mat)
 {
     this->operator=(_mat);
@@ -340,16 +329,7 @@ Mat2x2 Mat2x2::transpose() const
 //  [ g h i ]
 //    u v w
 
-Mat3x3::Mat3x3( float _a, float _b, float _c, 
-                float _d, float _e, float _f,
-                float _g, float _h, float _i )
-    : a{_a} , b{_b} , c{_c},
-      d{_d} , e{_e} , f{_f},
-      g{_g} , h{_h} , i{_i} {}
-Mat3x3::Mat3x3(const Vec3& u, const Vec3& v, const Vec3& w)
-    : a{u.x} , b{v.x} , c{w.x},
-      d{u.y} , e{v.y} , f{w.y},
-      g{u.z} , h{v.z} , i{w.z} {}
+// Constructors
 Mat3x3::Mat3x3(const Mat3x3& _mat)
 {
     this->operator=(_mat);

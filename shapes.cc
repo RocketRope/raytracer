@@ -11,12 +11,6 @@ Ray::Ray(const Vec3& _dir, const Vec3& _ori)
     : dir{_dir} , ori{_ori} {}
 
 
-//  --  class Shape  --  //
-
-// Constructors
-Shape::Shape(const Color& _color)
-    : color{_color} {}
-
 //  --  class Sphere  --  //
 
 // Constructors
@@ -65,11 +59,11 @@ Plane::Plane( const Vec3& _position, const Vec3& _normal )
 #include <iostream>
 
 // Override functions
-float Plane::intersect (const Ray& ray)   const 
+float Plane::intersect (const Ray& ray) const
 {
     float y = ray.dir * normal;
 
-    // Plane and ray parallel
+    // Plane faces away from or is parallel to ray
     if ( y >= 0.0f )
        return -1.0f;
 
@@ -77,7 +71,7 @@ float Plane::intersect (const Ray& ray)   const
 
     return x / y;
 }
-Vec3  Plane::get_normal(const Vec3& point) const
+Vec3  Plane::get_normal(const Vec3& /*point*/) const
 {
     return normal;
 }

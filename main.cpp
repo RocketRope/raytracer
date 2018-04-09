@@ -14,27 +14,31 @@ int main()
     Raytracer rt(width, height);
 
     Light_Direction* light1 = new Light_Direction( Vec3(1.0f, -1.0f, 1.0f),
-                                                   Color(1.0f, 0.98f, 0.93f),
+                                                   Color(0.9f, 0.88f, 0.83f),
                                                    1.0f );
-    rt.add(light1);
 
-    Light_Direction* light2 = new Light_Direction( Vec3(-1.0f, -0.5f, 1.0f),
-                                                   Color(0.45f, 0.45f, 0.5f),
+    Light_Direction* light2 = new Light_Direction( Vec3( -1.0f, -0.5f,  1.0f),
+                                                   Color( 0.45f, 0.45f, 0.5f),
                                                    1.0f );
+
+    rt.add(light1);
     rt.add(light2);
 
-    Sphere* sphere_red   = new Sphere( Vec3( 2.5f, -0.5f, 9.0f), 1.5f);
-            sphere_red->color = Color(Color::RED);
-    Sphere* sphere_green = new Sphere( Vec3( 0.0f, 1.0f, 12.0f), 3.0f);
-            sphere_green->color = Color(Color::LIGHT_GRAY);
-    Sphere* sphere_blue  = new Sphere( Vec3(-3.5f, -0.5f, 10.0f),  1.5f);
-            sphere_blue->color = Color(Color::BLUE);
+    Sphere* sphere_left  = new Sphere( Vec3(-3.5f, -0.5f, 10.0f),  1.5f);
+    sphere_left->material = Material(Color(Color::GREEN), 0.0f);
 
-    rt.add(sphere_red);
-    rt.add(sphere_green);
-    rt.add(sphere_blue);
+    Sphere* sphere_middle = new Sphere( Vec3( 0.0f, 1.0f, 12.0f), 3.0f);
+    sphere_middle->material = Material(Color(Color::WHITE), 200.0f, 0.8f);
+
+    Sphere* sphere_right   = new Sphere( Vec3( 2.5f, -0.5f, 9.0f), 1.5f);
+    sphere_right->material = Material(Color(Color::PURPLE), 0.0f);
+
+    rt.add(sphere_left);
+    rt.add(sphere_middle);
+    rt.add(sphere_right);
 
     Plane* plane = new Plane(Vec3(0.0f, -2.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
+    plane->material = Material(Color(Color::LIGHT_GRAY), 0.0, 0.0f);
     rt.add(plane);
 
     uint8_t* img_data = rt.render();
