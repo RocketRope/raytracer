@@ -24,7 +24,7 @@ class Vec2
         float y = 0.0f;
 
         // Constructors
-        Vec2(const Vec2& _vec);
+        Vec2(const Vec2& _vec) = default;
         explicit Vec2(float _x = 0.0f, float _y = 0.0f)
                      : x{_x} , y{_y} {}
         
@@ -73,7 +73,7 @@ class Vec3
 
 
         // Constructors
-        Vec3(const Vec3& _vec);
+        Vec3(const Vec3& _vec) = default;
         explicit Vec3(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f)
                      : x{_x} , y{_y} , z{_z} {}
         
@@ -121,7 +121,7 @@ class Mat2x2
 
         // Constructors
         
-        Mat2x2(const Mat2x2& _mat);
+        Mat2x2(const Mat2x2& _mat) = default;
         explicit Mat2x2(const Vec2& u, const Vec2& v)
                        : a{u.x} , b{v.x}, 
                          c{u.y} , d{v.y}  {}
@@ -170,7 +170,7 @@ class Mat3x3
         float g = 0.0f, h = 0.0f, i = 1.0f;
 
         // Constructors
-        Mat3x3(const Mat3x3& _mat);
+        Mat3x3(const Mat3x3& _mat) = default;
         explicit Mat3x3(const Vec3& u, const Vec3& v, const Vec3& w)
                        : a{u.x} , b{v.x} , c{w.x},
                          d{u.y} , e{v.y} , f{w.y},

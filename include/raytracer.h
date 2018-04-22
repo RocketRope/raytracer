@@ -6,9 +6,7 @@
 #include <string>
 #include <chrono>
 #include <iostream>
-
-#include <random>
-#include <limits>
+#include <thread>
 
 #include "vmath.h"
 #include "shapes.h"
@@ -47,7 +45,7 @@ class Raytracer
 
         int width;
         int height;
-        uint8_t* frame;
+        
 
         Camera camera;
 
@@ -57,7 +55,12 @@ class Raytracer
         Color ambient;
         Color background;
 
+        int   max_recursion_depth = 4;
+        float min_influence       = 0.01;
+
     public:
+
+        uint8_t* frame;
 
         // Constructors
         Raytracer(int _width = 800, int _height = 600);
@@ -69,7 +72,9 @@ class Raytracer
         void add(Light* p_light);
 
         unsigned char* render() const;
-        Color cast_ray(const Ray& ray) const;
+        Color cast_ray(const Ray& ray,
+                       int recursion_depth = 0,
+                       float influence = 1.0f ) const;
 
     private: 
 
@@ -85,7 +90,8 @@ class Raytracer
         Color shade_point( const Ray& ray,
                            const Vec3& point,
                            const Vec3& normal,
-                           const Material& material ) const;
+                           const Material& material,
+                           int recursion_depth ) const;
 
         Color shade_diffuse( float incident,
                              const Light* light,
@@ -101,58 +107,8 @@ class Raytracer
         Color shade_reflection( const Ray& ray,
                                 const Vec3& normal,
                                 const Vec3& point,
-                                const Material& material ) const;
-};
-
-class Timer
-{
-    private:
-
-        std::string msg;
-        std::chrono::high_resolution_clock::time_point start_point;
-
-        std::ostream& os;
-
-    public:
-
-        Timer(const std::string& _msg = "Timer", std::ostream& _os = std::cout )
-            : msg{_msg} , os{_os}
-        {
-            start_point = std::chrono::high_resolution_clock::now();
-        }
-
-        ~Timer()
-        {
-            std::chrono::high_resolution_clock::time_point end_point;
-            end_point = std::chrono::high_resolution_clock::now();
-
-            std::chrono::duration<double> delta_time = end_point - start_point;
-
-            os << std::endl << msg << " : " << delta_time.count() << "s" << std::endl; 
-        }
-};
-
-
-template < typename T >
-class Random
-{
-    private:
-
-        std::default_random_engine device;
-        std::uniform_real_distribution<double> dist;
-
-    public:
-
-        Random( T low = std::numeric_limits<T>::min() , T high = std::numeric_limits<T>::max() )
-            : dist{ (double) low , (double) high}
-        {
-            device.seed( std::chrono::system_clock::now().time_since_epoch().count() );
-        }
-
-        T operator () (void) 
-        {
-            return (T) dist(device);
-        }
+                                const Material& material,
+                                int recursion_depth ) const;
 };
 
 

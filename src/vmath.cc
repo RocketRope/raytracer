@@ -31,12 +31,6 @@ float degree_to_radian(float deg)
 //      [ y ]
 //        v
 
-// Constructors
-Vec2::Vec2(const Vec2& _vec)
-{
-    this->operator=(_vec);
-}
-
 // Assignment operators
 Vec2& Vec2::operator  = (const Vec2& rhs)
 {
@@ -134,12 +128,6 @@ Vec2 Vec2::projection(const Vec2& rhs) const
 //      [ y ]
 //      [ z ]
 //        v
-
-// Constructors
-Vec3::Vec3(const Vec3& _vec)
-{
-    this->operator=(_vec);
-}
 
 // Assignment operators
 Vec3& Vec3::operator  = (const Vec3& rhs)
@@ -247,12 +235,6 @@ Vec3  Vec3::cross_product(const Vec3& rhs) const
 //      [ c d ] 
 //        u v
 
-// Constructors
-Mat2x2::Mat2x2(const Mat2x2& _mat)
-{
-    this->operator=(_mat);
-}
-
 // Assignment operators
 Mat2x2& Mat2x2::operator  = (const Mat2x2& rhs)
 {
@@ -328,12 +310,6 @@ Mat2x2 Mat2x2::transpose() const
 //  [ d e f ]
 //  [ g h i ]
 //    u v w
-
-// Constructors
-Mat3x3::Mat3x3(const Mat3x3& _mat)
-{
-    this->operator=(_mat);
-}
 
 // Assignment operators
 Mat3x3& Mat3x3::operator  = (const Mat3x3& rhs)

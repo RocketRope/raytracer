@@ -3,6 +3,8 @@
 #include <cmath>
 #include <limits>
 
+#include "timer.h"
+
 
 //  --  class Camera  --  //
 
@@ -52,11 +54,11 @@ Ray Camera::get_primary_ray(int x, int y) const
 // Constructors
 Raytracer::Raytracer(int _width, int _height)
     : width{_width} , height{_height} ,
-      camera{_width , _height , 45.0f}
+      camera{_width , _height , 80.0f}
 {
     frame = new uint8_t[width * height * 4];
 
-    ambient    = Color(0.1f, 0.1f, 0.13f);
+    ambient    = Color(0.13f, 0.13f, 0.16f);
     background = Color(0x8b9dc300);
 }
 // Destructor
@@ -91,7 +93,7 @@ unsigned char* Raytracer::render() const
         for ( int x = 0 ; x < width ; x++ )
         {
             Ray primary_ray = camera.get_primary_ray(x, y);
-            Color color = cast_ray(primary_ray);
+            Color color = cast_ray(primary_ray, 0, 1.0f);
             
             frame[index++] = color.red   * 255.0f;
             frame[index++] = color.green * 255.0f;
@@ -103,9 +105,14 @@ unsigned char* Raytracer::render() const
     return (unsigned char*) frame;
 }
 
-Color Raytracer::cast_ray(const Ray& ray) const
+Color Raytracer::cast_ray( const Ray& ray, 
+                           int recursion_depth,
+                           float influence ) const
 {
     Color output;
+
+    if ( (recursion_depth >= max_recursion_depth) || (influence < min_influence) )
+        return output;
 
     float  closest_depth = 0.0f;
     Shape* closest_shape = intersection_closest(ray, closest_depth);
@@ -114,8 +121,12 @@ Color Raytracer::cast_ray(const Ray& ray) const
     {
         Vec3  point  = (ray.dir * closest_depth) + ray.ori;
         Vec3  normal = closest_shape->get_normal(point);
-        
-        output = shade_point(ray, point, normal, closest_shape->material);
+
+        output = shade_point( ray, 
+                              point, 
+                              normal, 
+                              closest_shape->material,
+                              recursion_depth );
 
         output.red   = ( output.red   > 1.0f ) ? 1.0f : output.red;
         output.green = ( output.green > 1.0f ) ? 1.0f : output.green;
@@ -142,7 +153,7 @@ Shape* Raytracer::intersection_closest( const Ray& ray,
         {
             float depth = shape->intersect(ray);
 
-            if ( ( depth > 0.0f ) && ( depth < closest_depth) )
+            if ( ( depth > 0.0001f ) && ( depth < closest_depth) )
             {
                 closest_depth = depth;
                 closest_shape = shape;
@@ -153,9 +164,9 @@ Shape* Raytracer::intersection_closest( const Ray& ray,
     return closest_shape;
 }
 
-bool Raytracer::shadow_test( const Light* light,
-                             const Vec3&  light_direction,
-                             const Vec3&  point ) const
+bool Raytracer::point_in_shadow( const Light* light,
+                                 const Vec3&  light_direction,
+                                 const Vec3&  point ) const
 {
     Ray   shadow_ray(light_direction, point);
     float shadow_depth;
@@ -172,7 +183,8 @@ bool Raytracer::shadow_test( const Light* light,
 Color Raytracer::shade_point( const Ray& ray,
                               const Vec3& point,
                               const Vec3& normal,
-                              const Material& material ) const
+                              const Material& material,
+                              int recursion_depth ) const
 {
     Color diffuse;
     Color specular;
@@ -201,7 +213,11 @@ Color Raytracer::shade_point( const Ray& ray,
         }
     }
 
-    reflection = shade_reflection( ray, normal, point, material);
+    reflection = shade_reflection( ray, 
+                                   normal, 
+                                   point, 
+                                   material, 
+                                   recursion_depth);
 
     return diffuse + specular + reflection + ( ambient * (1.0f - material.reflection));
 }
@@ -242,7 +258,8 @@ Color Raytracer::shade_specular( float incident,
 Color Raytracer::shade_reflection( const Ray& ray,
                                    const Vec3& normal,
                                    const Vec3& point,
-                                   const Material& material ) const
+                                   const Material& material,
+                                   int recursion_depth ) const
 {
     if ( material.reflection > 0.0f )
     {
@@ -252,7 +269,9 @@ Color Raytracer::shade_reflection( const Ray& ray,
         
         Ray ray_reflection(reflection, point);
 
-        return material.reflection * cast_ray(ray_reflection);
+        return material.reflection * cast_ray( ray_reflection,
+                                               recursion_depth + 1,
+                                               material.reflection );
     }
 
     return Color(0.0f, 0.0f, 0.0f);
